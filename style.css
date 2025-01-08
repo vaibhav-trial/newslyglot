@@ -166,3 +166,13 @@ body {
         align-items: center;
     }
 }
+
+/* Footer */
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}

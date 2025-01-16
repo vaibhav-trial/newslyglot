@@ -188,6 +188,29 @@ footer {
     width: 100%;
 }
 
+#extension-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+    a {
+        color: var(--chip-text-color);
+        text-decoration: none;
+        background-color: var(--accent-color);
+        padding: 10px 20px;
+        border-radius: 5px;
+        display: flex;
+    }
+
+    a:hover {
+        background-color: var(--secondary-accent-color);
+        color: var(--font-color);
+    }
+}
+
 #progress-bar {
     display: flex;
     justify-content: flex-start;

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="origin-trial"
+      content="AlZwgZip8kAx1qsTXdow6mUBZfrh3C7kNpkKVK66xkUOfZ7m8vnkzTDDyO2BQBlllsWLUb1I3aQJUHwdxhpx4QEAAABpeyJvcmlnaW4iOiJodHRwczovL25ld3NseWdsb3QuY29tOjQ0MyIsImZlYXR1cmUiOiJUcmFuc2xhdGlvbkFQSSIsImV4cGlyeSI6MTc1MzE0MjQwMCwiaXNTdWJkb21haW4iOnRydWV9"
+    />
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <div id="instructions">
+        <span>Getting translation... Please wait...</span>
+        <div id="progress-bar">
+          <div id="progress"></div>
+        </div>
+      </div>
+      <div id="demo-live">
+        <ul id="top-stories-list">
+          <li>
+            <div class="text-container">
+              <p class="native-text"></p>
+              <p class="english-text"></p>
+            </div>
+            <div class="play-icon" onclick="speakText(this)">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z"></path></svg>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <script>
+      const liveDemo = document.getElementById('demo-live');
+      const instructions = document.getElementById('instructions');
+      const topStoriesList = document.getElementById('top-stories-list');
+      const progressBar = document.getElementById('progress-bar');
+      const progress = document.getElementById('progress');
+      const nativeText = liveDemo.querySelector('.native-text');
+      const englishText = liveDemo.querySelector('.english-text');
+      (async () => {
+        liveDemo.style.display = 'none';
+        const search = new URLSearchParams(location.search);
+        const lang = search.get('lang');
+        const synthLang = search.get('synthlang');
+        const article = search.get('article');
+        if (!lang || !article || !synthLang) {
+          return location.replace('/');
+        }
+        // console.log('Search:', article, lang);
+        if (!'translation' in window || !'createTranslator' in window) {
+          instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
+          return;
+        }
+        const canTranslate = await translation.canTranslate({ sourceLanguage: lang, targetLanguage: 'en' });
+        if (!canTranslate) {
+          instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
+          return;
+        }
+        if (!'speechSynthesis' in window) {
+          instructions.textContent = 'Your browser does not support speech synthesis, please try again with a different browser.';
+          return;
+        }
+        const speechSupportedLanguages = (await getVoices()).map((voice) => voice.lang);
+        if (!speechSupportedLanguages.includes(synthLang)) {
+          instructions.textContent = 'Your browser does not support the selected language, please try again with a different language.';
+          return;
+        }
+        const translator = await translation.createTranslator({ sourceLanguage: lang, targetLanguage: 'en' });
+        translator.ondownloadprogress = (progressEvent) => {
+          const { loaded, total } = progressEvent;
+          const percentage = (loaded / total) * 100;
+          progress.style.width = `${percentage}%`;
+        };
+        const translatedArticle = await translator.translate(article);
+        instructions.style.display = 'none';
+        nativeText.textContent = article;
+        englishText.textContent = translatedArticle;
+        nativeText.setAttribute('lang', lang);
+        nativeText.setAttribute('synth-lang', synthLang);
+        liveDemo.style.display = 'flex';
+      })();
+      function getVoices() {
+        return new Promise((resolve, reject) => {
+          if (!'speechSynthesis' in window) {
+            reject('Speech synthesis not supported');
+          }
+          const id = setInterval(() => {
+            const voices = speechSynthesis.getVoices();
+            if (voices.length) {
+              clearInterval(id);
+              resolve(Object.values(voices));
+            }
+          }, 1000);
+        });
+      }
+      function speakText(nativeEl) {
+        const svgButton = nativeEl.querySelector('svg');
+        svgButton.style.display = 'none';
+        const lang = nativeText.getAttribute('lang');
+        const synthLang = nativeText.getAttribute('synth-lang');
+        const nativeUtterance = new SpeechSynthesisUtterance(nativeText.textContent);
+        nativeUtterance.lang = synthLang;
+        speechSynthesis.speak(nativeUtterance);
+        nativeUtterance.onend = () => {
+          const englishUtterance = new SpeechSynthesisUtterance(englishText.textContent);
+          englishUtterance.lang = 'en-US';
+          speechSynthesis.speak(englishUtterance);
+          englishUtterance.onend = () => {
+            svgButton.style.display = 'flex';
+          };
+        };
+      }
+      //   TODO: use encodeURIComponent to encode the article and lang parameters
+    </script>
+  </body>
+  <style>
+    html,
+    body {
+      height: 100%;
+    }
+  </style>
+</html>

@@ -52,7 +52,6 @@
         if (!lang || !article || !synthLang) {
           return location.replace('/');
         }
-        // console.log('Search:', article, lang);
         if (!'translation' in window || !'createTranslator' in window) {
           instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
           return;

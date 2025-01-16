@@ -46,9 +46,9 @@
       (async () => {
         liveDemo.style.display = 'none';
         const search = new URLSearchParams(location.search);
-        const lang = search.get('lang');
-        const synthLang = search.get('synthlang');
-        const article = search.get('article');
+        const lang = decodeURIComponent(search.get('lang'));
+        const synthLang = decodeURIComponent(search.get('synthlang'));
+        const article = decodeURIComponent(search.get('article'));
         if (!lang || !article || !synthLang) {
           return location.replace('/');
         }
@@ -116,7 +116,6 @@
           };
         };
       }
-      //   TODO: use encodeURIComponent to encode the article and lang parameters
     </script>
   </body>
   <style>

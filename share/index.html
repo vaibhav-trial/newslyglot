@@ -54,45 +54,54 @@
       const englishText = liveDemo.querySelector('.english-text');
       const copyButton = document.querySelector('#copy-button button');
       (async () => {
-        liveDemo.style.display = 'none';
-        const search = new URLSearchParams(location.search);
-        const lang = decodeURIComponent(search.get('lang'));
-        const synthLang = decodeURIComponent(search.get('synthlang'));
-        const article = decodeURIComponent(search.get('article'));
-        if (!lang || !article || !synthLang) {
-          return location.replace('/');
+        try {
+          liveDemo.style.display = 'none';
+          const search = new URLSearchParams(location.search);
+          const lang = decodeURIComponent(search.get('lang'));
+          const synthLang = decodeURIComponent(search.get('synthlang'));
+          const article = decodeURIComponent(search.get('article'));
+          if (!lang || !article || !synthLang) {
+            return location.replace('/');
+          }
+          if (!'translation' in window || !window.translation || !'createTranslator' in window || window.createTranslator) {
+            instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
+            instructions.style.textAlign = 'center';
+            return;
+          }
+          const canTranslate = await translation.canTranslate({ sourceLanguage: lang, targetLanguage: 'en' });
+          if (!canTranslate) {
+            instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
+            instructions.style.textAlign = 'center';
+            return;
+          }
+          if (!'speechSynthesis' in window) {
+            instructions.textContent = 'Your browser does not support speech synthesis, please try again with a different browser.';
+            instructions.style.textAlign = 'center';
+            return;
+          }
+          const speechSupportedLanguages = (await getVoices()).map((voice) => voice.lang);
+          if (!speechSupportedLanguages.includes(synthLang)) {
+            instructions.textContent = 'Your browser does not support the selected language, please try again with a different language.';
+            instructions.style.textAlign = 'center';
+            return;
+          }
+          const translator = await translation.createTranslator({ sourceLanguage: lang, targetLanguage: 'en' });
+          translator.ondownloadprogress = (progressEvent) => {
+            const { loaded, total } = progressEvent;
+            const percentage = (loaded / total) * 100;
+            progress.style.width = `${percentage}%`;
+          };
+          const translatedArticle = await translator.translate(article);
+          instructions.style.display = 'none';
+          nativeText.textContent = article;
+          englishText.textContent = translatedArticle;
+          nativeText.setAttribute('lang', lang);
+          nativeText.setAttribute('synth-lang', synthLang);
+          liveDemo.style.display = 'flex';
+        } catch (e) {
+          console.error(e);
+          alert('An error occurred, please try again later.');
         }
-        if (!'translation' in window || !'createTranslator' in window) {
-          instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
-          return;
-        }
-        const canTranslate = await translation.canTranslate({ sourceLanguage: lang, targetLanguage: 'en' });
-        if (!canTranslate) {
-          instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
-          return;
-        }
-        if (!'speechSynthesis' in window) {
-          instructions.textContent = 'Your browser does not support speech synthesis, please try again with a different browser.';
-          return;
-        }
-        const speechSupportedLanguages = (await getVoices()).map((voice) => voice.lang);
-        if (!speechSupportedLanguages.includes(synthLang)) {
-          instructions.textContent = 'Your browser does not support the selected language, please try again with a different language.';
-          return;
-        }
-        const translator = await translation.createTranslator({ sourceLanguage: lang, targetLanguage: 'en' });
-        translator.ondownloadprogress = (progressEvent) => {
-          const { loaded, total } = progressEvent;
-          const percentage = (loaded / total) * 100;
-          progress.style.width = `${percentage}%`;
-        };
-        const translatedArticle = await translator.translate(article);
-        instructions.style.display = 'none';
-        nativeText.textContent = article;
-        englishText.textContent = translatedArticle;
-        nativeText.setAttribute('lang', lang);
-        nativeText.setAttribute('synth-lang', synthLang);
-        liveDemo.style.display = 'flex';
       })();
       function getVoices() {
         return new Promise((resolve, reject) => {

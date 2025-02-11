@@ -72,7 +72,6 @@
           const percentage = (loaded / total) * 100;
           progress.style.width = `${percentage}%`;
         };
-        console.log('Translating article...', article);
         const translatedArticle = await translator.translate(article);
         return translatedArticle;
       };
@@ -147,9 +146,19 @@
           };
         };
       }
-      copyButton.addEventListener('click', function copyToClipboard() {
-        navigator.clipboard.writeText(location.href);
-        alert('Link copied, share it with your friends!');
+      copyButton.addEventListener('click', async function copyToClipboard() {
+        const urlToShorten = `https://is.gd/create.php?format=json&url=${encodeURIComponent(location.href.replace('localhost:8780', 'newslyglot.com'))}`;
+        let urlToCopy = '';
+        try {
+          const response = await fetch(urlToShorten);
+          const { shorturl } = await response.json();
+          urlToCopy = shorturl;
+        } catch (error) {
+          urlToCopy = location.href;
+        } finally {
+          navigator.clipboard.writeText(urlToCopy);
+          alert('Link copied, share it with your friends!');
+        }
       });
     </script>
   </body>

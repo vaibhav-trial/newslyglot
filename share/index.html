@@ -54,6 +54,28 @@
       const nativeText = liveDemo.querySelector('.native-text');
       const englishText = liveDemo.querySelector('.english-text');
       const copyButton = document.querySelector('#copy-button button');
+      const handleTranslation = async (article, sourceLanguage) => {
+        if (!'translation' in window || !window.translation || !'createTranslator' in window || window.createTranslator) {
+          instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
+          instructions.style.textAlign = 'center';
+          return false;
+        }
+        const canTranslate = await translation.canTranslate({ sourceLanguage, targetLanguage: 'en' });
+        if (!canTranslate) {
+          instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
+          instructions.style.textAlign = 'center';
+          return false;
+        }
+        const translator = await translation.createTranslator({ sourceLanguage, targetLanguage: 'en' });
+        translator.ondownloadprogress = (progressEvent) => {
+          const { loaded, total } = progressEvent;
+          const percentage = (loaded / total) * 100;
+          progress.style.width = `${percentage}%`;
+        };
+        console.log('Translating article...', article);
+        const translatedArticle = await translator.translate(article);
+        return translatedArticle;
+      };
       (async () => {
         try {
           liveDemo.style.display = 'none';
@@ -61,19 +83,16 @@
           const lang = decodeURIComponent(search.get('lang'));
           const synthLang = decodeURIComponent(search.get('synthlang'));
           const article = decodeURIComponent(search.get('article'));
+          let translatedArticle = decodeURIComponent(search.get('translatedArticle'));
           if (!lang || !article || !synthLang) {
             return location.replace('/');
           }
-          if (!'translation' in window || !window.translation || !'createTranslator' in window || window.createTranslator) {
-            instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
-            instructions.style.textAlign = 'center';
-            return;
-          }
-          const canTranslate = await translation.canTranslate({ sourceLanguage: lang, targetLanguage: 'en' });
-          if (!canTranslate) {
-            instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
-            instructions.style.textAlign = 'center';
-            return;
+          if (!translatedArticle || translatedArticle === 'undefined' || translatedArticle === 'null') {
+            const translationResponse = await handleTranslation(article, lang);
+            if (!translationResponse) {
+              return;
+            }
+            translatedArticle = translationResponse;
           }
           if (!'speechSynthesis' in window) {
             instructions.textContent = 'Your browser does not support speech synthesis, please try again with a different browser.';
@@ -86,13 +105,6 @@
             instructions.style.textAlign = 'center';
             return;
           }
-          const translator = await translation.createTranslator({ sourceLanguage: lang, targetLanguage: 'en' });
-          translator.ondownloadprogress = (progressEvent) => {
-            const { loaded, total } = progressEvent;
-            const percentage = (loaded / total) * 100;
-            progress.style.width = `${percentage}%`;
-          };
-          const translatedArticle = await translator.translate(article);
           instructions.style.display = 'none';
           nativeText.textContent = article;
           englishText.textContent = translatedArticle;

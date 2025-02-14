@@ -83,6 +83,7 @@
           const synthLang = decodeURIComponent(search.get('synthlang'));
           const article = decodeURIComponent(search.get('article'));
           let translatedArticle = decodeURIComponent(search.get('translatedArticle'));
+          let showPlayButton = true;
           if (!lang || !article || !synthLang) {
             return location.replace('/');
           }
@@ -94,15 +95,14 @@
             translatedArticle = translationResponse;
           }
           if (!'speechSynthesis' in window) {
-            instructions.textContent = 'Your browser does not support speech synthesis, please try again with a different browser.';
-            instructions.style.textAlign = 'center';
-            return;
+            showPlayButton = false;
           }
           const speechSupportedLanguages = (await getVoices()).map((voice) => voice.lang);
           if (!speechSupportedLanguages.includes(synthLang)) {
-            instructions.textContent = 'Your browser does not support the selected language, please try again with a different language.';
-            instructions.style.textAlign = 'center';
-            return;
+            showPlayButton = false;
+          }
+          if (!showPlayButton) {
+            document.querySelector('.play-icon').style.display = 'none';
           }
           instructions.style.display = 'none';
           nativeText.textContent = article;
@@ -147,17 +147,26 @@
         };
       }
       copyButton.addEventListener('click', async function copyToClipboard() {
-        const urlToShorten = `https://is.gd/create.php?format=json&url=${encodeURIComponent(location.href.replace('localhost:8780', 'newslyglot.com'))}`;
+        const newslyglotUrl = location.href.replace(/localhost:\d{4}/, 'newslyglot.com');
+        const urlToShorten = `https://is.gd/create.php?format=json&url=${encodeURIComponent(newslyglotUrl)}`;
         let urlToCopy = '';
         try {
-          const response = await fetch(urlToShorten);
+          copyButton.disabled = true;
+          copyButton.textContent = 'Please wait';
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+          const response = await fetch(urlToShorten, { signal: controller.signal });
+          clearTimeout(timeoutId);
           const { shorturl } = await response.json();
           urlToCopy = shorturl;
         } catch (error) {
-          urlToCopy = location.href;
+          console.error(error);
+          urlToCopy = newslyglotUrl;
         } finally {
           navigator.clipboard.writeText(urlToCopy);
           alert('Link copied, share it with your friends!');
+          copyButton.disabled = false;
+          copyButton.textContent = 'Copy Link';
         }
       });
     </script>

@@ -1,4 +1,4 @@
-document.querySelectorAll('li').forEach((li) => {
+document.querySelectorAll('#demo-live li').forEach((li) => {
   li.querySelector('.play-icon').addEventListener('click', (event) => {
     event.target.style.display = 'none';
     const nativeTextEl = li.querySelector('.native-text');

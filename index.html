@@ -3,35 +3,72 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Newslyglot</title>
+    <title>Newslyglot - Free AI-Powered Language Learning | Learn German, Spanish, Japanese & More</title>
+    <meta name="description" content="Newslyglot is an AI-powered language learning app for intermediate and advanced learners. Learn German, Spanish, Japanese, and other languages for free by reading native and translated news articles." />
+    <meta name="keywords" content="language learning, AI language learning, learn German, learn Spanish, learn Japanese, advanced language learning, intermediate language learning, free language learning" />
+    <meta name="author" content="Newslyglot" />
+    <meta property="og:title" content="Newslyglot | Learn German, Spanish, Japanese and other languages for free. For intermediate and advanced learners" />
+    <meta property="og:description" content="Newslyglot is an AI-powered language learning app for intermediate and advanced learners. Learn German, Spanish, Japanese, and other languages for free by reading native and translated news articles." />
+    <meta property="og:image" content="https://newslyglot.com/newslyglot-learn-culture.png" />
+    <meta property="og:url" content="https://newslyglot.com" />
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Newslyglot",
+        "url": "https://newslyglot.com",
+        "description": "Newslyglot is an AI-powered language learning app for intermediate and advanced learners. Learn German, Spanish, Japanese, and other languages for free by reading native and translated news articles.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Newslyglot"
+        }
+      }
+    </script>
   </head>
   <body>
+    <header>
+      <h1>Newslyglot</h1>
+      <nav>
+        <ul>
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#youtube-videos">Videos</a></li>
+          <li><a href="#demo-live">Live Demo</a></li>
+          <li><a href="https://www.facebook.com/sharer/sharer.php?u=https://newslyglot.com" target="_blank">Share on Facebook</a></li>
+          <li><a href="https://twitter.com/intent/tweet?url=https://newslyglot.com&text=Hey%2C%20advance%20your%20language%20skills%20by%20learning%20from%20News!" target="_blank">Share on Twitter</a></li>
+          <li>
+            <a
+              href="https://www.linkedin.com/shareArticle?mini=true&url=https://newslyglot.com&title=Hey%2C%20advance%20your%20language%20skills%20by%20learning%20from%20News!&summary=Hey%2C%20advance%20your%20language%20skills%20by%20learning%20from%20News!&source=newslyglot.com"
+              target="_blank"
+              >Share on LinkedIn</a
+            >
+          </li>
+        </ul>
+      </nav>
+      <button id="menu-toggle">☰</button>
+    </header>
     <div id="hero">
       <div id="hero-overlay">
         <div id="hero-content">
           <h1 class="spectral-extrabold">Newslyglot</h1>
           <p>AI-powered language learning app.</p>
           <small>Let the AI read and translate news for you.</small>
-        </div>
-        <a class="cta-btn" href="https://app.newslyglot.com" target="_blank"> Get the app </a>
-        <div id="demo-preview">
-          <img src="newslyglot-screenshot.png" alt="demo-preview" />
+          <a class="cta-btn" href="https://app.newslyglot.com/login?s=w" target="_blank"> Get the app </a>
         </div>
       </div>
     </div>
     <div id="preview-images">
       <div class="preview-image">
-        <img src="newslyglot-screenshot-2.png" alt="newslyglot-screenshot" />
+        <img src="newslyglot-screenshot-2.png" alt="Newslyglot app screenshot 2" />
       </div>
       <div class="preview-image">
-        <img src="newslyglot-screenshot-3.png" alt="newslyglot-screenshot-2" />
+        <img src="newslyglot-screenshot-3.png" alt="Newslyglot app screenshot 3" />
       </div>
       <div class="preview-image">
-        <img src="newslyglot-screenshot-4.png" alt="newslyglot-screenshot-3" />
+        <img src="newslyglot-screenshot-4.png" alt="Newslyglot app screenshot 4" />
       </div>
     </div>
     <div id="youtube-videos">
@@ -120,6 +157,19 @@
         <p>&copy; Newslyglot. All rights reserved.</p>
       </div>
     </footer>
-    <script src="app.js" defer></script>
+    <script src="/app.js" defer></script>
+    <script>
+      document.getElementById('menu-toggle').addEventListener('click', function () {
+        const nav = document.querySelector('nav ul');
+        nav.classList.toggle('show');
+      });
+      document.addEventListener('click', function (event) {
+        const nav = document.querySelector('nav ul');
+        const menuToggle = document.getElementById('menu-toggle');
+        if (!nav.contains(event.target) && !menuToggle.contains(event.target)) {
+          nav.classList.remove('show');
+        }
+      });
+    </script>
   </body>
 </html>

@@ -90,6 +90,8 @@ header nav ul li a:hover {
 
 #hero {
     background: linear-gradient(135deg, var(--accent-color), var(--secondary-accent-color));
+    background-size: 400% 400%;
+    animation: gradientAnimation 5s ease infinite;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -113,6 +115,20 @@ header nav ul li a:hover {
     a.cta-btn:hover {
         background-color: var(--secondary-accent-color);
         color: var(--font-color);
+    }
+}
+
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
     }
 }
 

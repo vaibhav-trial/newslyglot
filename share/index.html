@@ -7,6 +7,10 @@
       http-equiv="origin-trial"
       content="AlZwgZip8kAx1qsTXdow6mUBZfrh3C7kNpkKVK66xkUOfZ7m8vnkzTDDyO2BQBlllsWLUb1I3aQJUHwdxhpx4QEAAABpeyJvcmlnaW4iOiJodHRwczovL25ld3NseWdsb3QuY29tOjQ0MyIsImZlYXR1cmUiOiJUcmFuc2xhdGlvbkFQSSIsImV4cGlyeSI6MTc1MzE0MjQwMCwiaXNTdWJkb21haW4iOnRydWV9"
     />
+    <meta
+      http-equiv="origin-trial"
+      content="ApjXUN5oUVKhKxcrSgOyxH3ynpFXeuq7u7sK85GLZ1KLH9HcU9OcgGVVJWE48SpgVxyUsFHC+plamUIICjoyjwIAAAByeyJvcmlnaW4iOiJodHRwczovL25ld3NseWdsb3QuY29tOjQ0MyIsImZlYXR1cmUiOiJBSVByb21wdEFQSUZvckV4dGVuc2lvbiIsImV4cGlyeSI6MTc2MDQ4NjM5OSwiaXNTdWJkb21haW4iOnRydWV9"
+    />
     <title>Newslyglot Share</title>
     <link rel="stylesheet" href="/style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -22,17 +26,35 @@
         </div>
       </div>
       <div id="demo-live">
-        <ul id="top-stories-list">
-          <li>
-            <div class="text-container">
-              <p class="native-text"></p>
-              <p class="english-text"></p>
+        <div class="text-container">
+          <p class="native-text"></p>
+          <p class="english-text"></p>
+        </div>
+        <div class="actions">
+          <button onclick="openModal(fillInBlanksModal)">
+            <div class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                <path
+                  d="M140-440q-25 0-42.5-17.5T80-500q0-25 17.5-42.5T140-560h240q25 0 42.5 17.5T440-500q0 25-17.5 42.5T380-440H140Zm440 0q-25 0-42.5-17.5T520-500q0-25 17.5-42.5T580-560h240q25 0 42.5 17.5T880-500q0 25-17.5 42.5T820-440H580Z"
+                ></path>
+              </svg>
             </div>
-            <div class="play-icon" onclick="speakText(this)">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z"></path></svg>
+            Fill in the blanks
+          </button>
+          <div class="play-icon" onclick="speakText(this)">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path fill="#e8eaed" d="M320-200v-560l440 280-440 280Zm80-280Zm0 134 210-134-210-134v268Z"></path></svg>
+          </div>
+          <button onclick="openModal(speakWordsModal)">
+            <div class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                <path
+                  d="m798-322-62-62q44-41 69-97t25-119q0-63-25-118t-69-96l62-64q56 53 89 125t33 153q0 81-33 153t-89 125ZM670-450l-64-64q18-17 29-38.5t11-47.5q0-26-11-47.5T606-686l64-64q32 29 50 67.5t18 82.5q0 44-18 82.5T670-450Zm-310 10q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM40-120v-112q0-33 17-62t47-44q51-26 115-44t141-18q77 0 141 18t115 44q30 15 47 44t17 62v112H40Zm80-80h480v-32q0-11-5.5-20T580-266q-36-18-92.5-36T360-320q-71 0-127.5 18T140-266q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-600q0-33-23.5-56.5T360-680q-33 0-56.5 23.5T280-600q0 33 23.5 56.5T360-520Zm0-80Zm0 400Z"
+                ></path>
+              </svg>
             </div>
-          </li>
-        </ul>
+            Speak the words
+          </button>
+        </div>
         <div id="copy-button">
           <button>Copy Link</button>
         </div>
@@ -45,6 +67,34 @@
         </p>
       </div>
     </div>
+    <div id="fill-in-blanks-modal" class="modal-container">
+      <div class="modal-backdrop"></div>
+      <div class="modal-card">
+        <div class="modal-body">
+          <div class="modal-header">
+            <h2>Fill in the Blanks</h2>
+            <button class="close-button" onclick="closeModal(fillInBlanksModal)">X</button>
+          </div>
+          <div class="modal-content"></div>
+        </div>
+        <div class="modal-actions">
+          <button disabled="true">Check</button>
+        </div>
+      </div>
+    </div>
+    <div id="speak-words-modal" class="modal-container">
+      <div class="modal-backdrop"></div>
+      <div class="modal-card">
+        <div class="modal-body">
+          <div class="modal-header">
+            <h2>Speak the Words</h2>
+            <button class="close-button" onclick="closeModal(speakWordsModal)">X</button>
+          </div>
+          <div class="modal-content"></div>
+        </div>
+        <div class="modal-actions"></div>
+      </div>
+    </div>
     <script>
       const liveDemo = document.getElementById('demo-live');
       const instructions = document.getElementById('instructions');
@@ -54,6 +104,151 @@
       const nativeText = liveDemo.querySelector('.native-text');
       const englishText = liveDemo.querySelector('.english-text');
       const copyButton = document.querySelector('#copy-button button');
+      const fillInBlanksModalBody = document.querySelector('#fill-in-blanks-modal .modal-body');
+      const speakWordsModalBody = document.querySelector('#speak-words-modal .modal-body');
+      const fillInBlanksModal = document.getElementById('fill-in-blanks-modal');
+      const speakWordsModal = document.getElementById('speak-words-modal');
+      const PRACTICE_WORD_COUNT = 3;
+      const isSpeechRecognitionAvailable = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+
+      const recognizeText = (text, options) => {
+        if (!isSpeechRecognitionAvailable) {
+          alert('Speech recognition is not supported in this browser.');
+          throw new Error('Speech recognition is not supported in this browser.');
+        }
+        return new Promise((resolve, reject) => {
+          let isResolved = false;
+          const grammer = `#JSGF V1.0; grammar commands; public <command> = ${text};`;
+          const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+          recognition.lang = options.language || 'en-US';
+          if (window.SpeechGrammarList || window.webkitSpeechGrammarList) {
+            const grammarList = new (window.SpeechGrammarList || window.webkitSpeechGrammarList)();
+            grammarList.addFromString(grammer, 1);
+            recognition.grammars = grammarList;
+          }
+          recognition.interimResults = options.interimResults || false;
+          recognition.maxAlternatives = options.maxAlternatives || 1;
+
+          recognition.onresult = (event) => {
+            const results = Array.from(event.results).map((result) => result[0].transcript);
+            resolve(results);
+            isResolved = true;
+            recognition.stop();
+          };
+
+          recognition.onerror = (event) => {
+            reject(new Error(`Speech recognition error: ${event.error}`));
+          };
+
+          recognition.onend = () => {
+            console.log('Speech recognition service disconnected');
+            setTimeout(() => {
+              if (!isResolved) {
+                reject(new Error('Speech recognition service not resolved on result'));
+                recognition.stop();
+                recognition.abort();
+              }
+            }, 10);
+          };
+
+          recognition.start();
+
+          setTimeout(() => {
+            recognition.stop();
+          }, options.timeout || 5000);
+        });
+      };
+
+      const closeModal = (modal) => {
+        modal.style.display = 'none';
+      };
+      
+      const constructFillInBlanksModal = (nativeText, translatedText) => {
+        const words = [];
+        const nativeWords = nativeText.split(' ');
+        const randomIds = [];
+        // Get 3 random unique indices
+        while (randomIds.length < PRACTICE_WORD_COUNT && randomIds.length < nativeWords.length) {
+          const randomIndex = Math.floor(Math.random() * nativeWords.length);
+          if (!randomIds.includes(randomIndex)) {
+            randomIds.push(randomIndex);
+          }
+        }
+        // Create the words array with blanks at the random indices
+        nativeWords.forEach((word, index) => {
+          words.push({
+            word,
+            isBlank: randomIds.includes(index),
+          });
+        });
+        let modalContent = `<p class="translated-text">${translatedText}</p>`;
+        modalContent += `<p class="native-text">`;
+        modalContent += words
+          .map((word, id) => {
+            if (word.isBlank) {
+              return `<span id="fill-in-blank-id-${id}">________</span>`;
+            }
+            return `<span>${word.word}</span>`;
+          })
+          .join(' ');
+        modalContent += `</p>`;
+        modalContent += `<div class="fill-in-blank-chips">`;
+        words
+          .map((word, id) => ({ ...word, id }))
+          .filter((word) => word.isBlank)
+          .sort(() => Math.random() - 0.5)
+          .forEach(({ word, id }) => {
+            modalContent += `<span class="fill-in-blank-chip" id="fill-in-blank-chip-id-${id}">${word}</span>`;
+          });
+        modalContent += `</div>`;
+        fillInBlanksModalBody.querySelector('.modal-content').innerHTML = modalContent;
+        const fillInBlankChips = fillInBlanksModalBody.querySelectorAll('span.fill-in-blank-chip');
+        fillInBlankChips.forEach((chip) => {
+          chip.addEventListener('click', addChipToText);
+        });
+      };
+
+      const openModal = (modal) => {
+        modal.style.display = 'flex';
+      };
+
+      function checkIfAllFilled() {
+        const fillInBlankElements = fillInBlanksModalBody.querySelectorAll('span[filled]');
+        const checkButton = fillInBlanksModal.querySelector('.modal-actions button');
+        if (fillInBlankElements.length === PRACTICE_WORD_COUNT) {
+          checkButton.disabled = false;
+          checkButton.addEventListener('click', checkFillInBlanksResults);
+        } else {
+          checkButton.disabled = true;
+          checkButton.removeEventListener('click', checkFillInBlanksResults);
+        }
+      }
+
+      function addChipToText(event) {
+        const firstEmptyFillInBlank = fillInBlanksModalBody.querySelector('span[id^="fill-in-blank-id-"]:not([filled])');
+        if (!firstEmptyFillInBlank) {
+          return;
+        }
+        const chipId = event.target.id;
+        const chipText = event.target.textContent;
+        firstEmptyFillInBlank.textContent = chipText;
+        firstEmptyFillInBlank.setAttribute('filled', 'true');
+        event.target.style.display = 'none';
+        checkIfAllFilled();
+      }
+
+      function checkFillInBlanksResults() {
+        const answerText = fillInBlanksModalBody.querySelector('.native-text').textContent;
+        const originalNativeText = nativeText.textContent;
+        if (answerText === originalNativeText) {
+          alert('Correct!');
+          closeModal(fillInBlanksModal);
+        } else {
+          alert('Incorrect, please try again.');
+        }
+        constructFillInBlanksModal(nativeText.textContent, englishText.textContent);
+      }
+
       const handleTranslation = async (article, sourceLanguage) => {
         if (!'translation' in window || !window.translation || !'createTranslator' in window || window.createTranslator) {
           instructions.textContent = 'Your browser does not support translation services, please try again with a different browser.';
@@ -109,6 +304,7 @@
           englishText.textContent = translatedArticle;
           nativeText.setAttribute('lang', lang);
           nativeText.setAttribute('synth-lang', synthLang);
+          constructFillInBlanksModal(article, translatedArticle);
           liveDemo.style.display = 'flex';
         } catch (e) {
           console.error(e);
@@ -175,6 +371,137 @@
     html,
     body {
       height: 100%;
+      font-family: 'Spectral', serif;
+    }
+    #demo-live {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 80vw;
+      max-height: 80vh;
+      overflow: auto;
+      margin: 10px auto;
+    }
+    .text-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .actions {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .play-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--primary-color);
+    }
+    .actions button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      width: min-content;
+    }
+    #copy-button button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      color: var(--font-color);
+    }
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.1);
+      z-index: 199;
+    }
+    .modal-card {
+      position: relative;
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      width: 80vw;
+      margin: 10px auto;
+      z-index: 200;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-header button {
+      background-color: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .modal-body button,
+    .modal-actions button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .modal-actions button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .fill-in-blank-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .fill-in-blank-chip {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </html>

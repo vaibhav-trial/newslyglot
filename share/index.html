@@ -110,9 +110,98 @@
       const speakWordsModal = document.getElementById('speak-words-modal');
       const PRACTICE_WORD_COUNT = 3;
       const isSpeechRecognitionAvailable = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+      const charactersToRemoveFromWords = {
+        '.': {},
+        ',': {},
+        '!': {},
+        '?': {},
+        ':': {},
+        ';': {},
+        '(': {},
+        ')': {},
+        '[': {},
+        ']': {},
+        '{': {},
+        '}': {},
+        '"': {},
+        "'": {
+          strategy(word) {
+            const singleQuoteRegex = /^\'?(.*?)\'?$/;
+            return word.replace(singleQuoteRegex, '$1');
+          },
+        }, // Remove this character if only it's at the start or end of a word. It may be used as an apostrophe
+        '-': {
+          strategy(word) {
+            const negativeSignRegex = /^-+|-+$|(?<![\p{L}\p{N}])-|-(?![\p{L}\p{N}])/gu;
+            return word.replace(negativeSignRegex, '');
+          },
+        }, // Don't remove this character if it's in the middle of a word. It may be used as a hyphen
+        '«': {},
+        '»': {},
+        '“': {},
+        '”': {},
+        '‘': {
+          strategy(word) {
+            const singleQuoteRegex = /^\‘?(.*?)\‘?$/;
+            return word.replace(singleQuoteRegex, '$1');
+          },
+        },
+        '’': {
+          strategy(word) {
+            const singleQuoteRegex = /^\’?(.*?)\’?$/;
+            return word.replace(singleQuoteRegex, '$1');
+          },
+        },
+        '…': {},
+        '—': {},
+        '–': {},
+        '/': {},
+        '\\': {},
+        '|': {},
+        '<': {},
+        '>': {},
+        '`': {},
+        '~': {},
+        '@': {},
+        '#': {},
+        '%': {},
+        '^': {},
+        '*': {},
+        _: {},
+        '+': {},
+        '=': {},
+        '¡': {},
+        '¿': {},
+        '°': {},
+        '¹': {},
+        '²': {},
+        '³': {},
+        '¼': {},
+        '½': {},
+        '¾': {},
+        '€': {},
+        '¥': {},
+        '£': {},
+        '¢': {},
+        '¤': {},
+        '§': {},
+        '©': {},
+        '®': {},
+        '™': {},
+        '×': {},
+        '÷': {},
+        '±': {},
+        '🎙': {},
+      };
 
       const closeModal = (modal) => {
         modal.style.display = 'none';
+        if (modal === fillInBlanksModal) {
+          fillBlanksExercise.constructFillInBlanksModal(nativeText.textContent, englishText.textContent);
+        }
+        if (modal === speakWordsModal) {
+          speakingExercise.constructSpeakWordsModal(nativeText.textContent);
+        }
       };
 
       const openModal = (modal) => {
@@ -120,9 +209,9 @@
       };
 
       const fillBlanksExercise = {
-        constructFillInBlanksModal(nativeText, translatedText) {
+        constructFillInBlanksModal(nativeTextContent, translatedText) {
           const words = [];
-          const nativeWords = nativeText.split(' ');
+          const nativeWords = nativeTextContent.split(' ');
           const randomIds = [];
           // Get 3 random unique indices
           while (randomIds.length < PRACTICE_WORD_COUNT && randomIds.length < nativeWords.length) {
@@ -248,6 +337,76 @@
             }, options.timeout || 5000);
           });
         },
+        constructSpeakWordsModal(nativeTextContent) {
+          const randomIds = [];
+          const nativeWords = nativeTextContent.split(' ');
+          // Get 3 random unique indices
+          let attempts = 0;
+          // Create the words array with blanks at the random indices
+          const wordsToSpeak = [];
+          while (randomIds.length < PRACTICE_WORD_COUNT && randomIds.length < nativeWords.length) {
+            attempts++;
+            const randomIndex = Math.floor(Math.random() * nativeWords.length);
+            if (attempts < 100 && nativeWords[randomIndex].length < 3) {
+              // Check if the word at index is less than 3 characters
+              continue;
+            }
+            // Check if wordsToSpeak already contains the word
+            if (attempts < 100 && wordsToSpeak.includes(nativeWords[randomIndex])) {
+              continue;
+            }
+            if (!randomIds.includes(randomIndex)) {
+              randomIds.push(randomIndex);
+            }
+            wordsToSpeak.push(nativeWords[randomIndex]);
+          }
+          let modalContent = `<p class="speak-words-container">`;
+          wordsToSpeak.forEach((word, id) => {
+            const processedWord = Object.keys(charactersToRemoveFromWords).reduce((acc, char) => {
+              if (charactersToRemoveFromWords[char].strategy) {
+                return charactersToRemoveFromWords[char].strategy(acc);
+              }
+              return acc.replace(new RegExp(`\\${char}`, 'g'), '');
+            }, word);
+            modalContent += `<div class="speak-word"><span id="speak-word-id-${id}">${processedWord}</span><button class="speak-button" style="display: flex;">Speak</button><span style="display: none;">listening...</span></div>`;
+          });
+          modalContent += '</p>';
+          speakWordsModalBody.querySelector('.modal-content').innerHTML = modalContent;
+          speakWordsModalBody.querySelectorAll('button.speak-button').forEach((button, id) => {
+            button.addEventListener('click', () => {
+              button.style.display = 'none';
+              button.nextElementSibling.style.display = 'flex';
+              const word = button.previousElementSibling.textContent;
+              const options = {
+                language: nativeText.getAttribute('lang'),
+                interimResults: false,
+                maxAlternatives: 1,
+                timeout: 5000,
+              };
+              speakingExercise
+                .recognizeText(word, options)
+                .then((results) => {
+                  const spokenWord = results[0];
+                  if (spokenWord.toLowerCase() === word.toLowerCase()) {
+                    alert('Correct!');
+                    button.nextElementSibling.innerHTML = 'Correct!';
+                    button.nextElementSibling.style.display = 'flex';
+                    button.style.display = 'none';
+                  } else {
+                    alert(`Incorrect, you said: ${spokenWord}`);
+                    button.nextElementSibling.style.display = 'none';
+                    button.style.display = 'flex';
+                  }
+                })
+                .catch((error) => {
+                  console.error(error);
+                  alert('An error occurred during speech recognition.');
+                  button.nextElementSibling.style.display = 'none';
+                  button.style.display = 'flex';
+                });
+            });
+          });
+        },
       };
 
       const handleTranslation = async (article, sourceLanguage) => {
@@ -306,6 +465,7 @@
           nativeText.setAttribute('lang', lang);
           nativeText.setAttribute('synth-lang', synthLang);
           fillBlanksExercise.constructFillInBlanksModal(article, translatedArticle);
+          speakingExercise.constructSpeakWordsModal(article);
           liveDemo.style.display = 'flex';
         } catch (e) {
           console.error(e);
@@ -503,6 +663,26 @@
       padding: 5px 10px;
       border-radius: 5px;
       cursor: pointer;
+    }
+
+    .speak-words-container {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .speak-word {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid var(--primary-color);
+      border-radius: 5px;
+      background-color: #f9f9f9;
     }
   </style>
 </html>

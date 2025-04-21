@@ -111,143 +111,144 @@
       const PRACTICE_WORD_COUNT = 3;
       const isSpeechRecognitionAvailable = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
-      const recognizeText = (text, options) => {
-        if (!isSpeechRecognitionAvailable) {
-          alert('Speech recognition is not supported in this browser.');
-          throw new Error('Speech recognition is not supported in this browser.');
-        }
-        return new Promise((resolve, reject) => {
-          let isResolved = false;
-          const grammer = `#JSGF V1.0; grammar commands; public <command> = ${text};`;
-          const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-          recognition.lang = options.language || 'en-US';
-          if (window.SpeechGrammarList || window.webkitSpeechGrammarList) {
-            const grammarList = new (window.SpeechGrammarList || window.webkitSpeechGrammarList)();
-            grammarList.addFromString(grammer, 1);
-            recognition.grammars = grammarList;
-          }
-          recognition.interimResults = options.interimResults || false;
-          recognition.maxAlternatives = options.maxAlternatives || 1;
-
-          recognition.onresult = (event) => {
-            const results = Array.from(event.results).map((result) => result[0].transcript);
-            resolve(results);
-            isResolved = true;
-            recognition.stop();
-          };
-
-          recognition.onerror = (event) => {
-            reject(new Error(`Speech recognition error: ${event.error}`));
-          };
-
-          recognition.onend = () => {
-            console.log('Speech recognition service disconnected');
-            setTimeout(() => {
-              if (!isResolved) {
-                reject(new Error('Speech recognition service not resolved on result'));
-                recognition.stop();
-                recognition.abort();
-              }
-            }, 10);
-          };
-
-          recognition.start();
-
-          setTimeout(() => {
-            recognition.stop();
-          }, options.timeout || 5000);
-        });
-      };
-
       const closeModal = (modal) => {
         modal.style.display = 'none';
-      };
-      
-      const constructFillInBlanksModal = (nativeText, translatedText) => {
-        const words = [];
-        const nativeWords = nativeText.split(' ');
-        const randomIds = [];
-        // Get 3 random unique indices
-        while (randomIds.length < PRACTICE_WORD_COUNT && randomIds.length < nativeWords.length) {
-          const randomIndex = Math.floor(Math.random() * nativeWords.length);
-          if (!randomIds.includes(randomIndex)) {
-            randomIds.push(randomIndex);
-          }
-        }
-        // Create the words array with blanks at the random indices
-        nativeWords.forEach((word, index) => {
-          words.push({
-            word,
-            isBlank: randomIds.includes(index),
-          });
-        });
-        let modalContent = `<p class="translated-text">${translatedText}</p>`;
-        modalContent += `<p class="native-text">`;
-        modalContent += words
-          .map((word, id) => {
-            if (word.isBlank) {
-              return `<span id="fill-in-blank-id-${id}">________</span>`;
-            }
-            return `<span>${word.word}</span>`;
-          })
-          .join(' ');
-        modalContent += `</p>`;
-        modalContent += `<div class="fill-in-blank-chips">`;
-        words
-          .map((word, id) => ({ ...word, id }))
-          .filter((word) => word.isBlank)
-          .sort(() => Math.random() - 0.5)
-          .forEach(({ word, id }) => {
-            modalContent += `<span class="fill-in-blank-chip" id="fill-in-blank-chip-id-${id}">${word}</span>`;
-          });
-        modalContent += `</div>`;
-        fillInBlanksModalBody.querySelector('.modal-content').innerHTML = modalContent;
-        const fillInBlankChips = fillInBlanksModalBody.querySelectorAll('span.fill-in-blank-chip');
-        fillInBlankChips.forEach((chip) => {
-          chip.addEventListener('click', addChipToText);
-        });
       };
 
       const openModal = (modal) => {
         modal.style.display = 'flex';
       };
 
-      function checkIfAllFilled() {
-        const fillInBlankElements = fillInBlanksModalBody.querySelectorAll('span[filled]');
-        const checkButton = fillInBlanksModal.querySelector('.modal-actions button');
-        if (fillInBlankElements.length === PRACTICE_WORD_COUNT) {
-          checkButton.disabled = false;
-          checkButton.addEventListener('click', checkFillInBlanksResults);
-        } else {
-          checkButton.disabled = true;
-          checkButton.removeEventListener('click', checkFillInBlanksResults);
-        }
-      }
+      const fillBlanksExercise = {
+        constructFillInBlanksModal(nativeText, translatedText) {
+          const words = [];
+          const nativeWords = nativeText.split(' ');
+          const randomIds = [];
+          // Get 3 random unique indices
+          while (randomIds.length < PRACTICE_WORD_COUNT && randomIds.length < nativeWords.length) {
+            const randomIndex = Math.floor(Math.random() * nativeWords.length);
+            if (!randomIds.includes(randomIndex)) {
+              randomIds.push(randomIndex);
+            }
+          }
+          // Create the words array with blanks at the random indices
+          nativeWords.forEach((word, index) => {
+            words.push({
+              word,
+              isBlank: randomIds.includes(index),
+            });
+          });
+          let modalContent = `<p class="translated-text">${translatedText}</p>`;
+          modalContent += `<p class="native-text">`;
+          modalContent += words
+            .map((word, id) => {
+              if (word.isBlank) {
+                return `<span id="fill-in-blank-id-${id}">________</span>`;
+              }
+              return `<span>${word.word}</span>`;
+            })
+            .join(' ');
+          modalContent += `</p>`;
+          modalContent += `<div class="fill-in-blank-chips">`;
+          words
+            .map((word, id) => ({ ...word, id }))
+            .filter((word) => word.isBlank)
+            .sort(() => Math.random() - 0.5)
+            .forEach(({ word, id }) => {
+              modalContent += `<span class="fill-in-blank-chip" id="fill-in-blank-chip-id-${id}">${word}</span>`;
+            });
+          modalContent += `</div>`;
+          fillInBlanksModalBody.querySelector('.modal-content').innerHTML = modalContent;
+          const fillInBlankChips = fillInBlanksModalBody.querySelectorAll('span.fill-in-blank-chip');
+          fillInBlankChips.forEach((chip) => {
+            chip.addEventListener('click', fillBlanksExercise.addChipToText);
+          });
+        },
+        checkIfAllFilled() {
+          const fillInBlankElements = fillInBlanksModalBody.querySelectorAll('span[filled]');
+          const checkButton = fillInBlanksModal.querySelector('.modal-actions button');
+          if (fillInBlankElements.length === PRACTICE_WORD_COUNT) {
+            checkButton.disabled = false;
+            checkButton.addEventListener('click', fillBlanksExercise.checkFillInBlanksResults);
+          } else {
+            checkButton.disabled = true;
+            checkButton.removeEventListener('click', fillBlanksExercise.checkFillInBlanksResults);
+          }
+        },
+        addChipToText(event) {
+          const firstEmptyFillInBlank = fillInBlanksModalBody.querySelector('span[id^="fill-in-blank-id-"]:not([filled])');
+          if (!firstEmptyFillInBlank) {
+            return;
+          }
+          const chipId = event.target.id;
+          const chipText = event.target.textContent;
+          firstEmptyFillInBlank.textContent = chipText;
+          firstEmptyFillInBlank.setAttribute('filled', 'true');
+          event.target.style.display = 'none';
+          fillBlanksExercise.checkIfAllFilled();
+        },
+        checkFillInBlanksResults() {
+          const answerText = fillInBlanksModalBody.querySelector('.native-text').textContent;
+          const originalNativeText = nativeText.textContent;
+          if (answerText === originalNativeText) {
+            alert('Correct!');
+            closeModal(fillInBlanksModal);
+          } else {
+            alert('Incorrect, please try again.');
+          }
+          fillBlanksExercise.constructFillInBlanksModal(nativeText.textContent, englishText.textContent);
+        },
+      };
 
-      function addChipToText(event) {
-        const firstEmptyFillInBlank = fillInBlanksModalBody.querySelector('span[id^="fill-in-blank-id-"]:not([filled])');
-        if (!firstEmptyFillInBlank) {
-          return;
-        }
-        const chipId = event.target.id;
-        const chipText = event.target.textContent;
-        firstEmptyFillInBlank.textContent = chipText;
-        firstEmptyFillInBlank.setAttribute('filled', 'true');
-        event.target.style.display = 'none';
-        checkIfAllFilled();
-      }
+      const speakingExercise = {
+        recognizeText: (text, options) => {
+          if (!isSpeechRecognitionAvailable) {
+            alert('Speech recognition is not supported in this browser.');
+            throw new Error('Speech recognition is not supported in this browser.');
+          }
+          return new Promise((resolve, reject) => {
+            let isResolved = false;
+            const grammer = `#JSGF V1.0; grammar commands; public <command> = ${text};`;
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = options.language || 'en-US';
+            if (window.SpeechGrammarList || window.webkitSpeechGrammarList) {
+              const grammarList = new (window.SpeechGrammarList || window.webkitSpeechGrammarList)();
+              grammarList.addFromString(grammer, 1);
+              recognition.grammars = grammarList;
+            }
+            recognition.interimResults = options.interimResults || false;
+            recognition.maxAlternatives = options.maxAlternatives || 1;
 
-      function checkFillInBlanksResults() {
-        const answerText = fillInBlanksModalBody.querySelector('.native-text').textContent;
-        const originalNativeText = nativeText.textContent;
-        if (answerText === originalNativeText) {
-          alert('Correct!');
-          closeModal(fillInBlanksModal);
-        } else {
-          alert('Incorrect, please try again.');
-        }
-        constructFillInBlanksModal(nativeText.textContent, englishText.textContent);
-      }
+            recognition.onresult = (event) => {
+              const results = Array.from(event.results).map((result) => result[0].transcript);
+              resolve(results);
+              isResolved = true;
+              recognition.stop();
+            };
+
+            recognition.onerror = (event) => {
+              reject(new Error(`Speech recognition error: ${event.error}`));
+            };
+
+            recognition.onend = () => {
+              console.log('Speech recognition service disconnected');
+              setTimeout(() => {
+                if (!isResolved) {
+                  reject(new Error('Speech recognition service not resolved on result'));
+                  recognition.stop();
+                  recognition.abort();
+                }
+              }, 10);
+            };
+
+            recognition.start();
+
+            setTimeout(() => {
+              recognition.stop();
+            }, options.timeout || 5000);
+          });
+        },
+      };
 
       const handleTranslation = async (article, sourceLanguage) => {
         if (!'translation' in window || !window.translation || !'createTranslator' in window || window.createTranslator) {
@@ -304,7 +305,7 @@
           englishText.textContent = translatedArticle;
           nativeText.setAttribute('lang', lang);
           nativeText.setAttribute('synth-lang', synthLang);
-          constructFillInBlanksModal(article, translatedArticle);
+          fillBlanksExercise.constructFillInBlanksModal(article, translatedArticle);
           liveDemo.style.display = 'flex';
         } catch (e) {
           console.error(e);

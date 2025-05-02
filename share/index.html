@@ -505,7 +505,7 @@
       }
       copyButton.addEventListener('click', async function copyToClipboard() {
         const newslyglotUrl = location.href.replace(/localhost:\d{4}/, 'newslyglot.com');
-        const urlToShorten = `https://is.gd/create.php?format=json&url=${encodeURIComponent(newslyglotUrl)}`;
+        const urlToShorten = `https://v.gd/create.php?format=json&url=${encodeURIComponent(newslyglotUrl)}`;
         let urlToCopy = '';
         try {
           copyButton.disabled = true;
